@@ -20,7 +20,7 @@ int FileManager::file_exist(char* filename,int len)
 			struct stat   buffer;
 		  	return (stat (filename, &buffer) == 0);
 		  */
-			filename[len]='\0';
+			//filename[len]='\0';
 			if(access( filename, F_OK ) != -1 )
 			return 0;
 			return -1;

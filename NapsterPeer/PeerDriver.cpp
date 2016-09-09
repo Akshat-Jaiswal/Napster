@@ -14,10 +14,12 @@ int main(){
 	char IP[25],filename[BUFFER_SIZE];
 	char buffer[256];
 	int port,sockfd;
+	/*
 	printf("Enter Server IP Address:");
 	scanf("%s",IP);
 	printf("Enter Server PORT:");
 	scanf("%d",&port);
+	*/
 	/*
 	// create a connection manager object
 	ConnectionManager mg;
@@ -63,8 +65,11 @@ int main(){
 	close(sockfd);
 	*/
 	Peer peer;
-	cout<<peer.join("127.0.0.1",6666)<<endl;
-
+	cout<<"Join Request"<<peer.join("127.0.0.1",6666)<<endl;
+	cout<<"Publish Request"<<peer.publish("~/Desktop/'not type able.txt'")<<endl;
+	cout<<"Fetch Request"<<peer.fetch("SampleFile.txt")<<endl;
+	cout<<"Closing Connection"<<endl;
+	peer.~Peer();
 }
 
 
