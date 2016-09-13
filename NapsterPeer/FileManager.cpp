@@ -14,7 +14,7 @@ FileManager::FileManager() {
 FileManager::~FileManager() {
 	// TODO Auto-generated destructor stub
 }
-int FileManager::file_exist(char* filename,int len)
+int FileManager::file_exist(char* filename)
 {
 		  /*
 			struct stat   buffer;

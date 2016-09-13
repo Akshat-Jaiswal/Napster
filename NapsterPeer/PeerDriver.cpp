@@ -9,67 +9,90 @@
 #include "FileManager.h"
 #include <iostream>
 #include "Peer.h"
+#include <signal.h>
+#include  <sys/ipc.h>
+#include  <sys/shm.h>
 using namespace std;
+Peer peer1;
+void signal_handler(int signal){
+	printf("Stopping Upload Service..\n");
+	printf("\n Closing Connections ..\n");
+	// calling destructor to clean the object
+	peer1.~Peer();
+}
 int main(){
-	char IP[25],filename[BUFFER_SIZE];
-	char buffer[256];
-	int port,sockfd;
-	/*
+	char IP[25],filename[255];
+	int port,op,childpid;
+	signal(SIGINT,signal_handler);
+	signal(SIGHUP,signal_handler);
+	signal(SIGQUIT,signal_handler);
 	printf("Enter Server IP Address:");
 	scanf("%s",IP);
 	printf("Enter Server PORT:");
 	scanf("%d",&port);
-	*/
-	/*
-	// create a connection manager object
-	ConnectionManager mg;
-	sockfd=mg.connectTo(IP,port);
-	if(sockfd<0){
-		printf("Error Connecting To server: %d :",sockfd);
+	printf("Trying to Connect to Server ..\n");
+	int code=peer1.join(IP,port);
+	if(code!=SUCCESS){
+		printf("[[JOIN FAILED]] Problem Contacting Server.. \n");
+		printf("Terminating Program ..\n");
+		exit(0);
 	}
-		printf("Successfully Connected to server\n");
-	// send a file name
-	//printf("Enter the File Name:");
-	//fflush(stdin);
-	//cin.getline(filename,sizeof(filename));
+	cout<<"SuccessFully Joined the System"<<endl;
+	// start upload service in a child process
+	cout<<"Trying to Start Upload Service"<< endl;
+	childpid=fork();
+	if(!childpid){
+		if(peer1.start_upload_server()==SUCCESS){
+								printf("Successfully started upload Server\n");
+								peer1.start_upload_service();
+		}
+		else{
+				cout<<"Upload Service Failed To Start ..\n";
+				printf("Terminating Upload Program ..\n");
+				exit(0);
+		}
+		//terminate the process
+		exit(0);
+	}
+	// sleep for 5 sec
+	sleep(5);
 
-	// build the header
-	/*
-			Start the handshake
-		*/
-	/*
-		int n,code;
-		sprintf(buffer,"10 %d %s",strlen(filename)-1,filename);
-		printf("Sending header:%s\n",buffer);
-		write(sockfd,buffer,sizeof(buffer));
-		// now read the response
-		if((n=read(sockfd,buffer,sizeof(buffer)))<0){
-			perror("Server : Reading Header");
-	 	}
-		// add the delemiter
-		buffer[n]='\0';
-	     	sscanf(buffer,"%d %d",&code,&n);
-	     	printf("Header:\n");
-	     	printf("Code:%d\t Length:%d\t Filename:%s\n",code,n,&(buffer[5]));
-		bzero(buffer,sizeof(buffer));
-		if(code==11){
-		    sprintf(buffer,"20 %d %s",strlen(filename)-1,filename);
-		 	write(sockfd,buffer,sizeof(buffer));
-		    printf("Initiating File Transfer ...\n");
+	do{
+		cout<<"1. Publish"<<endl;
+		cout<<"2. Fetch"<<endl;
+		cout<<"3. Quit"<<endl;
+		cout<<"Choose:";
+		cin>>op;
+		switch(op){
+		case 1: cout<<"Enter Complete Path of File to be Published (without spaces):";
+				cin>>filename;
+				if(peer1.publish(filename)==SUCCESS){
+					cout<<"[[ Publish Successful ]] SuccessFully Published File to Server"<<endl;
+				}
+				else{
+					cout<<"[[ Publish Failed ]] Some Problem Please Try after Sometime or Restart "<<endl;
 
-		    // create a File Manager
-		    FileManager fm;
-		    fm.receiveFile(sockfd,filename);
-		    printf("File Transfer complete \n");
-		 }
-	close(sockfd);
-	*/
-	Peer peer;
-	cout<<"Join Request"<<peer.join("127.0.0.1",6666)<<endl;
-	cout<<"Publish Request"<<peer.publish("~/Desktop/'not type able.txt'")<<endl;
-	cout<<"Fetch Request"<<peer.fetch("SampleFile.txt")<<endl;
-	cout<<"Closing Connection"<<endl;
-	peer.~Peer();
+				}
+				break;
+		case 2: cout<<"Enter File Name to Be Fetched:";
+				cin>>filename;
+				code=peer1.fetch(filename);
+				if(code==SUCCESS||code==SUCCESS_BUT_OBSOLETE){
+					cout<<"Download Started in background"<<endl;
+				}
+				else
+					cout<<"[[ Download Failed ]]"<<endl;
+				break;
+		case 3:	// kill the upload service child
+				kill(childpid,SIGQUIT);
+				cout<<"Thank You ..."<<endl;
+				break;
+		default:cout<<"[[Invalid Option]] Please choose valid option .."<<endl;
+				break;
+		}
+	}while(op!=3);
+	//cout<<"publish request"<<peer1.publish("/home/genesis/Desktop/not_type_able.txt");
+	peer1.~Peer();
 }
 
 
