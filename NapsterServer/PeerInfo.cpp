@@ -13,7 +13,7 @@ PeerInfo::PeerInfo() {
 }
 PeerInfo::PeerInfo(char *ip,time_t uptime) {
 	// TODO Auto-generated constructor stub
-	this->ip=ip;
+	strcpy(this->ip,ip);
 	this->uptime=uptime;
 }
 PeerInfo::~PeerInfo() {

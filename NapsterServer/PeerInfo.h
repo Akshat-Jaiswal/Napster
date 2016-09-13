@@ -15,7 +15,7 @@ class PeerInfo {
 public:
 	PeerInfo();
 	PeerInfo(char *ip,time_t uptime);
-	char* ip;
+	char ip[25];
 	time_t uptime;
 	bool operator==(PeerInfo P2);
 	bool operator<(PeerInfo P2);
