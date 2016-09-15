@@ -14,16 +14,16 @@ FileManager::FileManager() {
 FileManager::~FileManager() {
 	// TODO Auto-generated destructor stub
 }
-int FileManager::file_exist(char* filename,int len)
+bool FileManager::file_exist(char* filename)
 {
 		  /*
 			struct stat   buffer;
 		  	return (stat (filename, &buffer) == 0);
 		  */
-			filename[len]='\0';
+			//filename[len]='\0';
 			if(access( filename, F_OK ) != -1 )
-			return 0;
-			return -1;
+			return true;
+			return false;
 }
 /*
 *   Function to SEND a File To A Peer

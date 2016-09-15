@@ -24,15 +24,15 @@
 #include <arpa/inet.h>
 
 class FileManager {
-private:
+public:
 	/*
 	* Function To check Whether File Exists or not
 	* @param filename: Name of the file
-	* @return int: 	0-Success
-	*		-1-Fail
+	* @return bool:
+	* 		true-Success
+	*		false-Fail
 	*/
-	int file_exist (char *filename,int len);
-public:
+	bool file_exist (char *filename);
 	FileManager();
 	/*
 	*   Function to Receive a File From A Peer
