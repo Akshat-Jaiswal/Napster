@@ -14,7 +14,7 @@
 #include <cstdio>
 #include <ctime>
 #include "Database.h"
-
+#include <iostream>
 #define HEADER_SIZE 64
 class ServiceHandler {
 private:

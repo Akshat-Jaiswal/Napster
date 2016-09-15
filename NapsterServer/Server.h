@@ -20,6 +20,8 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include "ServiceHandler.h"
+#include <sys/time.h>
+#include <errno.h>
 class Server {
 private:
 	int serverSocket;
